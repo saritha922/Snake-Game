@@ -1,7 +1,5 @@
 // Game constants
 let inputDir = {x:0, y:0};
-let startX = 0, startY = 0;   // ✅ FIXED
-
 const movesound = new Audio("move.mp3");
 const foodsound = new Audio("food.mp3");
 const gameOversound = new Audio("finish.mp3");
@@ -20,175 +18,219 @@ let hiScoreBox = document.getElementById("hiscorebox");
 let hiScore = localStorage.getItem("hiscore");
 
 if(hiScore === null){
-    hiScore = 0;
-    localStorage.setItem("hiscore", hiScore);
+hiScore = 0;
+localStorage.setItem("hiscore", hiScore);
 }
 else{
-    hiScore = Number(hiScore);
+hiScore = Number(hiScore);
 }
 
 hiScoreBox.innerHTML = "High Score: " + hiScore;
 
-
-// Main loop
+// Main game loop
 function main(ctime){
-    window.requestAnimationFrame(main);
-
-    if((ctime - lastPaintTime)/1000 < 1/speed){
-        return;
-    }
-
-    lastPaintTime = ctime;
-
-    // STOP if no input
-    if(inputDir.x === 0 && inputDir.y === 0){
-        drawGame(); // only display
-        return;
-    }
-
-    gameEngine();
-}
-
-
-// Draw only (important for mobile start)
-function drawGame(){
-    playArea.innerHTML = "";
-
-    snakeArr.forEach((e,index)=>{
-        let el = document.createElement("div");
-        el.style.gridRowStart = e.y;
-        el.style.gridColumnStart = e.x;
-        el.classList.add(index===0 ? "head" : "snake");
-        playArea.appendChild(el);
-    });
-
-    let foodEl = document.createElement("div");
-    foodEl.style.gridRowStart = food.y;
-    foodEl.style.gridColumnStart = food.x;
-    foodEl.classList.add("food");
-    playArea.appendChild(foodEl);
-}
-
-
-// Collision
-function collide(snake){
-    for(let i=1;i<snake.length;i++){
-        if(snake[i].x === snake[0].x && snake[i].y === snake[0].y){
-            return true;
-        }
-    }
-
-    if(snake[0].x >=18 || snake[0].x <=0 || snake[0].y >=18 || snake[0].y <=0){
-        return true;
-    }
-
-    return false;
-}
-
-
-// Game logic
-function gameEngine(){
-
-    if(collide(snakeArr)){
-        gameOversound.play();
-        alert("Game Over");
-
-        inputDir = {x:0,y:0};
-        snakeArr = [{x:13,y:15}];
-        score = 0;
-        scoreBox.innerHTML = "Score: 0";
-        return;
-    }
-
-    // Eat food
-    if(snakeArr[0].x === food.x && snakeArr[0].y === food.y){
-
-        foodsound.play();
-        score++;
-
-        scoreBox.innerHTML = "Score: " + score;
-
-        if(score > hiScore){
-            hiScore = score;
-            localStorage.setItem("hiscore", hiScore);
-            hiScoreBox.innerHTML = "High Score: " + hiScore;
-        }
-
-        snakeArr.unshift({
-            x: snakeArr[0].x + inputDir.x,
-            y: snakeArr[0].y + inputDir.y
-        });
-
-        food = {
-            x: Math.floor(Math.random()*16)+1,
-            y: Math.floor(Math.random()*16)+1
-        };
-    }
-
-    // Move snake
-    for(let i=snakeArr.length-2;i>=0;i--){
-        snakeArr[i+1] = {...snakeArr[i]};
-    }
-
-    snakeArr[0].x += inputDir.x;
-    snakeArr[0].y += inputDir.y;
-
-    drawGame(); // display
-}
-
-
-// Run
 window.requestAnimationFrame(main);
 
+if((ctime - lastPaintTime)/1000 < 1/speed){  
+    return;  
+}  
 
-// Keyboard
+lastPaintTime = ctime;  
+gameEngine();
+
+}
+
+// Collision detection
+function collide(snake){
+
+// snake hit itself  
+for(let i=1;i<snake.length;i++){  
+    if(snake[i].x === snake[0].x && snake[i].y === snake[0].y){  
+        return true;  
+    }  
+}  
+
+// snake hit wall  
+if(snake[0].x >=18 || snake[0].x <=0 || snake[0].y >=18 || snake[0].y <=0){  
+    return true;  
+}  
+
+return false;
+
+}
+
+function gameEngine(){
+
+// Game Over  
+if(collide(snakeArr)){  
+    gameOversound.play();  
+    inputDir = {x:0,y:0};  
+    alert("Game Over");  
+    snakeArr = [{x:13,y:15}];  
+    score = 0;  
+}  
+
+
+// Eat food  
+if(snakeArr[0].x === food.x && snakeArr[0].y === food.y){  
+
+    foodsound.play();  
+    score += 1;  
+
+    scoreBox.innerHTML = "Score: " + score;  
+
+    if(score > hiScore){  
+        hiScore = score;  
+        localStorage.setItem("hiscore", hiScore);  
+        hiScoreBox.innerHTML = "High Score: " + hiScore;  
+    }  
+
+    snakeArr.unshift({  
+        x: snakeArr[0].x + inputDir.x,  
+        y: snakeArr[0].y + inputDir.y  
+    });  
+
+    let a = 2;  
+    let b = 16;  
+
+    food = {  
+        x: Math.round(a + (b-a)*Math.random()),  
+        y: Math.round(a + (b-a)*Math.random())  
+    }  
+}  
+
+
+// Move snake  
+for(let i = snakeArr.length-2; i>=0; i--){  
+    snakeArr[i+1] = {...snakeArr[i]};  
+}  
+
+snakeArr[0].x += inputDir.x;  
+snakeArr[0].y += inputDir.y;  
+
+
+// Display snake  
+playArea.innerHTML = "";  
+
+snakeArr.forEach((e,index)=>{  
+
+    let snakeElement = document.createElement("div");  
+
+    snakeElement.style.gridRowStart = e.y;  
+    snakeElement.style.gridColumnStart = e.x;  
+
+    if(index === 0){  
+        snakeElement.classList.add("head");  
+    }  
+    else{  
+        snakeElement.classList.add("snake");  
+    }  
+
+    playArea.appendChild(snakeElement);  
+});  
+
+
+// Display food  
+let foodElement = document.createElement("div");  
+
+foodElement.style.gridRowStart = food.y;  
+foodElement.style.gridColumnStart = food.x;  
+
+foodElement.classList.add("food");  
+
+playArea.appendChild(foodElement);
+
+}
+
+// Run game
+window.requestAnimationFrame(main);
+
+// Controls
 window.addEventListener("keydown", e => {
 
-    movesound.play();
+movesound.play();  
 
-    if(e.key === "ArrowUp" && inputDir.y !== 1){
-        inputDir = {x:0, y:-1};
-    }
-    else if(e.key === "ArrowDown" && inputDir.y !== -1){
-        inputDir = {x:0, y:1};
-    }
-    else if(e.key === "ArrowLeft" && inputDir.x !== 1){
-        inputDir = {x:-1, y:0};
-    }
-    else if(e.key === "ArrowRight" && inputDir.x !== -1){
-        inputDir = {x:1, y:0};
-    }
+switch(e.key){  
+
+    case "ArrowUp":  
+        inputDir.x = 0;  
+        inputDir.y = -1;  
+        break;  
+
+    case "ArrowDown":  
+        inputDir.x = 0;  
+        inputDir.y = 1;  
+        break;  
+
+    case "ArrowLeft":  
+        inputDir.x = -1;  
+        inputDir.y = 0;  
+        break;  
+
+    case "ArrowRight":  
+        inputDir.x = 1;  
+        inputDir.y = 0;  
+        break;  
+}
+
 });
-
-
-// Touch swipe (FIXED)
+// Touch controls
 document.addEventListener("touchstart", function(e){
-    startX = e.touches[0].clientX;
-    startY = e.touches[0].clientY;
+startX = e.touches[0].clientX;
+startY = e.touches[0].clientY;
 });
 
 document.addEventListener("touchend", function(e){
-    let dx = e.changedTouches[0].clientX - startX;
-    let dy = e.changedTouches[0].clientY - startY;
+let endX = e.changedTouches[0].clientX;
+let endY = e.changedTouches[0].clientY;
 
-    if(Math.abs(dx) > Math.abs(dy)){
-        if(dx > 0 && inputDir.x !== -1){
-            inputDir = {x:1,y:0};
-        } else if(inputDir.x !== 1){
-            inputDir = {x:-1,y:0};
-        }
-    } else {
-        if(dy > 0 && inputDir.y !== -1){
-            inputDir = {x:0,y:1};
-        } else if(inputDir.y !== 1){
-            inputDir = {x:0,y:-1};
-        }
-    }
+let diffX = endX - startX;  
+let diffY = endY - startY;  
+
+if(Math.abs(diffX) > Math.abs(diffY)){  
+    if(diffX > 0 && inputDir.x !== -1){  
+        inputDir.x = 1;  
+        inputDir.y = 0;  
+    } else if(inputDir.x !== 1) {  
+        inputDir.x = -1;  
+        inputDir.y = 0;  
+    }  
+} else {  
+    if(diffY > 0 && inputDir.y !== -1){  
+        inputDir.x = 0;  
+        inputDir.y = 1;  
+    } else if(inputDir.y !== 1) {  
+        inputDir.x = 0;  
+        inputDir.y = -1;  
+    }  
+}
+
 });
+// Button Controls (Mobile)
+function moveUp(){
+if(inputDir.y !== 1){
+inputDir.x = 0;
+inputDir.y = -1;
+}
+}
 
+function moveDown(){
+if(inputDir.y !== -1){
+inputDir.x = 0;
+inputDir.y = 1;
+}
+}
 
-// Buttons
-function moveUp(){ if(inputDir.y!==1) inputDir={x:0,y:-1}; }
-function moveDown(){ if(inputDir.y!==-1) inputDir={x:0,y:1}; }
-function moveLeft(){ if(inputDir.x!==1) inputDir={x:-1,y:0}; }
-function moveRight(){ if(inputDir.x!==-1) inputDir={x:1,y:0}; }
+function moveLeft(){
+if(inputDir.x !== 1){
+inputDir.x = -1;
+inputDir.y = 0;
+}
+}
+
+function moveRight(){
+if(inputDir.x !== -1){
+inputDir.x = 1;
+inputDir.y = 0;
+}
+}
