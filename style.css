@@ -61,13 +61,42 @@ body{
     font-weight: bold;
 }
 .controls{
-    text-align: center;
-    margin-top: 10px;
+   position: relative;
+   height: 150px;
+   width: 150px;
+   margin-top: 20px;
+   border-radius: 50%;
+    background: rgba(255,255,255,0.1);
 }
 .controls button{
-    padding:10px;
-    margin: 5px;
-    font-size: 20px;
+    position: absolute;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(0,0,0,0.6);
+    color: white;
+    font-size: 18px;
+}
+.controls button:nth-child(1){/*UP*/
+    top:0;
+    left:50%;
+    transform: translateX(-50%);
+}
+.controls button:nth-child(2){/*Down*/
+    bottom:0;
+    left:50%;
+    transform: translateX(-50%);
+}
+.controls button:nth-child(3){/*Left*/
+    top:50%;
+    left:0;
+    transform: translateY(-50%);
+}
+.controls button:nth-child(4){/*Right*/
+    top:50%;
+    right:0;
+    transform: translateY(-50%);
 }
 @media(min-width:768px){
     .controls{
