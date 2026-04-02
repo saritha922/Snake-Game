@@ -1,5 +1,7 @@
 // Game constants
-let inputDir = {x:0, y:0};
+let inputDir = {x:0, y:1};
+let startX, startY;
+
 const movesound = new Audio("move.mp3");
 const foodsound = new Audio("food.mp3");
 const gameOversound = new Audio("finish.mp3");
@@ -44,14 +46,12 @@ function main(ctime){
 // Collision detection
 function collide(snake){
 
-    // snake hit itself
     for(let i=1;i<snake.length;i++){
         if(snake[i].x === snake[0].x && snake[i].y === snake[0].y){
             return true;
         }
     }
 
-    // snake hit wall
     if(snake[0].x >=18 || snake[0].x <=0 || snake[0].y >=18 || snake[0].y <=0){
         return true;
     }
@@ -65,12 +65,12 @@ function gameEngine(){
     // Game Over
     if(collide(snakeArr)){
         gameOversound.play();
-        inputDir = {x:0,y:0};
+        inputDir = {x:0,y:1};
         alert("Game Over");
         snakeArr = [{x:13,y:15}];
         score = 0;
+        scoreBox.innerHTML = "Score: 0";
     }
-
 
     // Eat food
     if(snakeArr[0].x === food.x && snakeArr[0].y === food.y){
@@ -100,7 +100,6 @@ function gameEngine(){
         }
     }
 
-
     // Move snake
     for(let i = snakeArr.length-2; i>=0; i--){
         snakeArr[i+1] = {...snakeArr[i]};
@@ -108,7 +107,6 @@ function gameEngine(){
 
     snakeArr[0].x += inputDir.x;
     snakeArr[0].y += inputDir.y;
-
 
     // Display snake
     playArea.innerHTML = "";
@@ -130,7 +128,6 @@ function gameEngine(){
         playArea.appendChild(snakeElement);
     });
 
-
     // Display food
     let foodElement = document.createElement("div");
 
@@ -143,41 +140,39 @@ function gameEngine(){
 }
 
 
-
 // Run game
 window.requestAnimationFrame(main);
 
 
-// Controls
+// Keyboard Controls (FIXED)
 window.addEventListener("keydown", e => {
 
     movesound.play();
 
-    switch(e.key){
+    if(e.key === "ArrowUp" && inputDir.y !== 1){
+        inputDir.x = 0;
+        inputDir.y = -1;
+    }
 
-        case "ArrowUp":
-            inputDir.x = 0;
-            inputDir.y = -1;
-            break;
+    else if(e.key === "ArrowDown" && inputDir.y !== -1){
+        inputDir.x = 0;
+        inputDir.y = 1;
+    }
 
-        case "ArrowDown":
-            inputDir.x = 0;
-            inputDir.y = 1;
-            break;
+    else if(e.key === "ArrowLeft" && inputDir.x !== 1){
+        inputDir.x = -1;
+        inputDir.y = 0;
+    }
 
-        case "ArrowLeft":
-            inputDir.x = -1;
-            inputDir.y = 0;
-            break;
-
-        case "ArrowRight":
-            inputDir.x = 1;
-            inputDir.y = 0;
-            break;
+    else if(e.key === "ArrowRight" && inputDir.x !== -1){
+        inputDir.x = 1;
+        inputDir.y = 0;
     }
 
 });
-// Touch controls
+
+
+// Touch Controls (Swipe)
 document.addEventListener("touchstart", function(e){
     startX = e.touches[0].clientX;
     startY = e.touches[0].clientY;
@@ -194,7 +189,7 @@ document.addEventListener("touchend", function(e){
         if(diffX > 0 && inputDir.x !== -1){
             inputDir.x = 1;
             inputDir.y = 0;
-        } else if(inputDir.x !== 1) {
+        } else if(inputDir.x !== 1){
             inputDir.x = -1;
             inputDir.y = 0;
         }
@@ -202,13 +197,15 @@ document.addEventListener("touchend", function(e){
         if(diffY > 0 && inputDir.y !== -1){
             inputDir.x = 0;
             inputDir.y = 1;
-        } else if(inputDir.y !== 1) {
+        } else if(inputDir.y !== 1){
             inputDir.x = 0;
             inputDir.y = -1;
         }
     }
 });
-// Button Controls (Mobile)
+
+
+// Button Controls
 function moveUp(){
     if(inputDir.y !== 1){
         inputDir.x = 0;
