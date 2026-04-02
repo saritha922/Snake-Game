@@ -62,7 +62,6 @@ function collide(snake){
 // Game logic
 function gameEngine(){
 
-    // Game Over
     if(gameStarted && collide(snakeArr)){
         gameOversound.play();
         alert("Game Over");
@@ -74,7 +73,6 @@ function gameEngine(){
         scoreBox.innerHTML = "Score: 0";
     }
 
-    // Eat food
     if(gameStarted && snakeArr[0].x === food.x && snakeArr[0].y === food.y){
 
         foodsound.play();
@@ -99,7 +97,6 @@ function gameEngine(){
         };
     }
 
-    // Move snake
     if(gameStarted){
         for(let i=snakeArr.length-2;i>=0;i--){
             snakeArr[i+1] = {...snakeArr[i]};
@@ -109,17 +106,13 @@ function gameEngine(){
         snakeArr[0].y += inputDir.y;
     }
 
-    // Display
     playArea.innerHTML = "";
 
     snakeArr.forEach((e,index)=>{
         let el = document.createElement("div");
-
         el.style.gridRowStart = e.y;
         el.style.gridColumnStart = e.x;
-
         el.classList.add(index===0 ? "head" : "snake");
-
         playArea.appendChild(el);
     });
 
@@ -135,7 +128,7 @@ function gameEngine(){
 window.requestAnimationFrame(main);
 
 
-// Keyboard controls
+// Keyboard (same)
 window.addEventListener("keydown", e => {
 
     if(!gameStarted){
@@ -143,33 +136,25 @@ window.addEventListener("keydown", e => {
         movesound.play();
     }
 
-    if(e.key === "ArrowUp"){
-        if(inputDir.y !== 1){
-            inputDir = {x:0, y:-1};
-        }
+    if(e.key === "ArrowUp" && inputDir.y !== 1){
+        inputDir = {x:0, y:-1};
     }
 
-    if(e.key === "ArrowDown"){
-        if(inputDir.y !== -1){
-            inputDir = {x:0, y:1};
-        }
+    if(e.key === "ArrowDown" && inputDir.y !== -1){
+        inputDir = {x:0, y:1};
     }
 
-    if(e.key === "ArrowLeft"){
-        if(inputDir.x !== 1){
-            inputDir = {x:-1, y:0};
-        }
+    if(e.key === "ArrowLeft" && inputDir.x !== 1){
+        inputDir = {x:-1, y:0};
     }
 
-    if(e.key === "ArrowRight"){
-        if(inputDir.x !== -1){
-            inputDir = {x:1, y:0};
-        }
+    if(e.key === "ArrowRight" && inputDir.x !== -1){
+        inputDir = {x:1, y:0};
     }
 });
 
 
-// Touch controls
+// 🔥 FINAL FIX (TOUCH)
 document.addEventListener("touchstart", function(e){
     startX = e.touches[0].clientX;
     startY = e.touches[0].clientY;
@@ -185,47 +170,25 @@ document.addEventListener("touchend", function(e){
     let dx = e.changedTouches[0].clientX - startX;
     let dy = e.changedTouches[0].clientY - startY;
 
+    // ❌ remove reverse restriction → direct mapping
     if(Math.abs(dx) > Math.abs(dy)){
-        if(dx > 0 && inputDir.x !== -1){
+        if(dx > 0){
             inputDir = {x:1,y:0};
-        } else if(inputDir.x !== 1){
+        } else {
             inputDir = {x:-1,y:0};
         }
     } else {
-        if(dy > 0 && inputDir.y !== -1){
-            inputDir = {x:0,y:1};
-        } else if(inputDir.y !== 1){
+        if(dy > 0){
+            inputDir = {x:0,y:1};   // DOWN FIX
+        } else {
             inputDir = {x:0,y:-1};
         }
     }
 });
 
 
-// Button controls
-function moveUp(){
-    if(!gameStarted){ gameStarted=true; movesound.play(); }
-    if(inputDir.y !== 1){
-        inputDir = {x:0,y:-1};
-    }
-}
-
-function moveDown(){
-    if(!gameStarted){ gameStarted=true; movesound.play(); }
-    if(inputDir.y !== -1){
-        inputDir = {x:0,y:1};
-    }
-}
-
-function moveLeft(){
-    if(!gameStarted){ gameStarted=true; movesound.play(); }
-    if(inputDir.x !== 1){
-        inputDir = {x:-1,y:0};
-    }
-}
-
-function moveRight(){
-    if(!gameStarted){ gameStarted=true; movesound.play(); }
-    if(inputDir.x !== -1){
-        inputDir = {x:1,y:0};
-    }
-}
+// Buttons (same)
+function moveUp(){ gameStarted=true; inputDir={x:0,y:-1}; }
+function moveDown(){ gameStarted=true; inputDir={x:0,y:1}; }
+function moveLeft(){ gameStarted=true; inputDir={x:-1,y:0}; }
+function moveRight(){ gameStarted=true; inputDir={x:1,y:0}; }
