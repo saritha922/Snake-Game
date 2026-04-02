@@ -177,6 +177,7 @@ window.addEventListener("keydown", e => {
     }
 
 });
+// Touch controls
 document.addEventListener("touchstart", function(e){
     startX = e.touches[0].clientX;
     startY = e.touches[0].clientY;
@@ -190,20 +191,48 @@ document.addEventListener("touchend", function(e){
     let diffY = endY - startY;
 
     if(Math.abs(diffX) > Math.abs(diffY)){
-        if(diffX > 0){
+        if(diffX > 0 && inputDir.x !== -1){
             inputDir.x = 1;
             inputDir.y = 0;
-        } else {
+        } else if(inputDir.x !== 1) {
             inputDir.x = -1;
             inputDir.y = 0;
         }
     } else {
-        if(diffY > 0){
+        if(diffY > 0 && inputDir.y !== -1){
             inputDir.x = 0;
             inputDir.y = 1;
-        } else {
+        } else if(inputDir.y !== 1) {
             inputDir.x = 0;
             inputDir.y = -1;
         }
     }
 });
+// Button Controls (Mobile)
+function moveUp(){
+    if(inputDir.y !== 1){
+        inputDir.x = 0;
+        inputDir.y = -1;
+    }
+}
+
+function moveDown(){
+    if(inputDir.y !== -1){
+        inputDir.x = 0;
+        inputDir.y = 1;
+    }
+}
+
+function moveLeft(){
+    if(inputDir.x !== 1){
+        inputDir.x = -1;
+        inputDir.y = 0;
+    }
+}
+
+function moveRight(){
+    if(inputDir.x !== -1){
+        inputDir.x = 1;
+        inputDir.y = 0;
+    }
+}
