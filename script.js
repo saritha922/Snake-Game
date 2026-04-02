@@ -1,7 +1,6 @@
 // Game constants
-let inputDir = {x:0, y:0};   // STOP initially
-let gameStarted = false;     // NEW FLAG
-let startX, startY;
+let inputDir = {x:0, y:0};
+let startX = 0, startY = 0;   // ✅ FIXED
 
 const movesound = new Audio("move.mp3");
 const foodsound = new Audio("food.mp3");
@@ -41,7 +40,33 @@ function main(ctime){
 
     lastPaintTime = ctime;
 
-    gameEngine(); // ALWAYS draw (important)
+    // STOP if no input
+    if(inputDir.x === 0 && inputDir.y === 0){
+        drawGame(); // only display
+        return;
+    }
+
+    gameEngine();
+}
+
+
+// Draw only (important for mobile start)
+function drawGame(){
+    playArea.innerHTML = "";
+
+    snakeArr.forEach((e,index)=>{
+        let el = document.createElement("div");
+        el.style.gridRowStart = e.y;
+        el.style.gridColumnStart = e.x;
+        el.classList.add(index===0 ? "head" : "snake");
+        playArea.appendChild(el);
+    });
+
+    let foodEl = document.createElement("div");
+    foodEl.style.gridRowStart = food.y;
+    foodEl.style.gridColumnStart = food.x;
+    foodEl.classList.add("food");
+    playArea.appendChild(foodEl);
 }
 
 
@@ -64,21 +89,19 @@ function collide(snake){
 // Game logic
 function gameEngine(){
 
-    // Game Over
-    if(gameStarted && collide(snakeArr)){
+    if(collide(snakeArr)){
         gameOversound.play();
         alert("Game Over");
 
         inputDir = {x:0,y:0};
-        gameStarted = false;
-
         snakeArr = [{x:13,y:15}];
         score = 0;
         scoreBox.innerHTML = "Score: 0";
+        return;
     }
 
     // Eat food
-    if(gameStarted && snakeArr[0].x === food.x && snakeArr[0].y === food.y){
+    if(snakeArr[0].x === food.x && snakeArr[0].y === food.y){
 
         foodsound.play();
         score++;
@@ -102,37 +125,15 @@ function gameEngine(){
         };
     }
 
-    // Move only if started
-    if(gameStarted){
-        for(let i=snakeArr.length-2;i>=0;i--){
-            snakeArr[i+1] = {...snakeArr[i]};
-        }
-
-        snakeArr[0].x += inputDir.x;
-        snakeArr[0].y += inputDir.y;
+    // Move snake
+    for(let i=snakeArr.length-2;i>=0;i--){
+        snakeArr[i+1] = {...snakeArr[i]};
     }
 
-    // Display ALWAYS
-    playArea.innerHTML = "";
+    snakeArr[0].x += inputDir.x;
+    snakeArr[0].y += inputDir.y;
 
-    snakeArr.forEach((e,index)=>{
-        let el = document.createElement("div");
-
-        el.style.gridRowStart = e.y;
-        el.style.gridColumnStart = e.x;
-
-        el.classList.add(index===0 ? "head" : "snake");
-
-        playArea.appendChild(el);
-    });
-
-    let foodEl = document.createElement("div");
-
-    foodEl.style.gridRowStart = food.y;
-    foodEl.style.gridColumnStart = food.x;
-    foodEl.classList.add("food");
-
-    playArea.appendChild(foodEl);
+    drawGame(); // display
 }
 
 
@@ -143,10 +144,7 @@ window.requestAnimationFrame(main);
 // Keyboard
 window.addEventListener("keydown", e => {
 
-    if(!gameStarted){
-        gameStarted = true;
-        movesound.play();
-    }
+    movesound.play();
 
     if(e.key === "ArrowUp" && inputDir.y !== 1){
         inputDir = {x:0, y:-1};
@@ -163,46 +161,34 @@ window.addEventListener("keydown", e => {
 });
 
 
-// Touch swipe
-document.addEventListener("touchstart", e=>{
+// Touch swipe (FIXED)
+document.addEventListener("touchstart", function(e){
     startX = e.touches[0].clientX;
     startY = e.touches[0].clientY;
 });
 
-document.addEventListener("touchend", e=>{
-
-    if(!gameStarted){
-        gameStarted = true;
-        movesound.play();
-    }
-
+document.addEventListener("touchend", function(e){
     let dx = e.changedTouches[0].clientX - startX;
     let dy = e.changedTouches[0].clientY - startY;
 
     if(Math.abs(dx) > Math.abs(dy)){
-        if(dx>0 && inputDir.x!==-1) inputDir={x:1,y:0};
-        else if(inputDir.x!==1) inputDir={x:-1,y:0};
-    }else{
-        if(dy>0 && inputDir.y!==-1) inputDir={x:0,y:1};
-        else if(inputDir.y!==1) inputDir={x:0,y:-1};
+        if(dx > 0 && inputDir.x !== -1){
+            inputDir = {x:1,y:0};
+        } else if(inputDir.x !== 1){
+            inputDir = {x:-1,y:0};
+        }
+    } else {
+        if(dy > 0 && inputDir.y !== -1){
+            inputDir = {x:0,y:1};
+        } else if(inputDir.y !== 1){
+            inputDir = {x:0,y:-1};
+        }
     }
 });
 
 
 // Buttons
-function moveUp(){
-    if(!gameStarted){ gameStarted=true; movesound.play(); }
-    if(inputDir.y!==1) inputDir={x:0,y:-1};
-}
-function moveDown(){
-    if(!gameStarted){ gameStarted=true; movesound.play(); }
-    if(inputDir.y!==-1) inputDir={x:0,y:1};
-}
-function moveLeft(){
-    if(!gameStarted){ gameStarted=true; movesound.play(); }
-    if(inputDir.x!==1) inputDir={x:-1,y:0};
-}
-function moveRight(){
-    if(!gameStarted){ gameStarted=true; movesound.play(); }
-    if(inputDir.x!==-1) inputDir={x:1,y:0};
-}
+function moveUp(){ if(inputDir.y!==1) inputDir={x:0,y:-1}; }
+function moveDown(){ if(inputDir.y!==-1) inputDir={x:0,y:1}; }
+function moveLeft(){ if(inputDir.x!==1) inputDir={x:-1,y:0}; }
+function moveRight(){ if(inputDir.x!==-1) inputDir={x:1,y:0}; }
