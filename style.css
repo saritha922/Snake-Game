@@ -1,0 +1,76 @@
+.container{
+    
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction:column;
+}
+*{
+    padding:0;
+    margin:0;
+}
+body{  
+    margin:0;
+    padding:0;
+    background-image: url("desert.jpg");
+    background-size: cover;
+    background-position: center;
+    background-color: aqua; 
+    min-height: 100vh;
+    background-repeat: no-repeat;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#playArea{
+    background: linear-gradient(rgb(99, 232, 99),yellow);
+    width: 90vmin;
+    height: 92vmin;
+    border:2px solid black;
+    display: grid;
+    grid-template-rows: repeat(18,1fr);
+    grid-template-columns: repeat(18,1fr);
+}
+
+.snake{
+    background-color: purple;
+}
+
+.food{
+    background-color: green;
+}
+
+.head{
+    background-color: red;
+}
+
+#scorebox{
+    position:absolute;
+    top:10px;
+    right:200px;
+    font-size: 39px;
+    font-weight: bold;
+} 
+
+#hiscorebox{
+    position:absolute;
+    top:60px;
+    right:100px;
+    font-size: 39px;
+    font-weight: bold;
+}
+.controls{
+    text-align: center;
+    margin-top: 10px;
+}
+.controls button{
+    padding:10px;
+    margin: 5px;
+    font-size: 20px;
+}
+@media(min-width:768px){
+    .controls{
+        display:none;
+    }
+}
